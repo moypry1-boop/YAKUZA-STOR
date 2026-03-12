@@ -1,0 +1,49 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper Functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isAdmin() {
+      return isAuthenticated() && 
+        (exists(/databases/$(database)/documents/admins/$(request.auth.uid)) ||
+         request.auth.token.email == "moypry1@gmail.com");
+    }
+
+    function isSuperAdmin() {
+      return isAuthenticated() && request.auth.token.email == "moypry1@gmail.com";
+    }
+
+    // Products: Anyone can read, only admin can write
+    match /products/{productId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Orders: Anyone can create (to buy), but only admin can read/update
+    match /orders/{orderId} {
+      allow create: if true;
+      allow read, update, delete: if isAdmin();
+    }
+
+    // Admins: Only super admin can manage
+    match /admins/{adminId} {
+      allow read: if isAuthenticated();
+      allow write: if isSuperAdmin();
+    }
+
+    // Admin Requests: Users can create and read their own, super admin can manage
+    match /adminRequests/{requestId} {
+      allow create: if isAuthenticated();
+      allow read: if isAuthenticated() && (isSuperAdmin() || (exists(resource) && resource.data.uid == request.auth.uid) || (!exists(resource)));
+      allow write: if isSuperAdmin();
+    }
+
+    // Users: Private data
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+  }
+}

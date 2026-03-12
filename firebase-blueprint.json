@@ -1,0 +1,53 @@
+{
+  "entities": {
+    "Product": {
+      "title": "Product",
+      "description": "A FiveM script or product for sale.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "description": "Name of the script" },
+        "description": { "type": "string", "description": "Detailed description" },
+        "price": { "type": "number", "description": "Price in EGP" },
+        "imageUrl": { "type": "string", "description": "URL to the product image" },
+        "videoUrl": { "type": "string", "description": "URL to the product video" },
+        "downloadUrl": { "type": "string", "description": "URL to download the script" },
+        "category": { "type": "string", "description": "Category of the script" }
+      },
+      "required": ["name", "price", "imageUrl", "downloadUrl"]
+    },
+    "Order": {
+      "title": "Order",
+      "description": "A purchase request.",
+      "type": "object",
+      "properties": {
+        "productId": { "type": "string", "description": "ID of the product" },
+        "productName": { "type": "string", "description": "Name of the product" },
+        "customerPhone": { "type": "string", "description": "Customer's Vodafone Cash number" },
+        "customerEmail": { "type": "string", "description": "Customer's Email for script delivery" },
+        "transactionId": { "type": "string", "description": "Vodafone Cash Transaction ID" },
+        "amount": { "type": "number", "description": "Amount paid" },
+        "status": { "type": "string", "enum": ["pending", "completed", "failed"], "description": "Status of the order" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Time of order" }
+      },
+      "required": ["productId", "customerPhone", "amount", "status"]
+    }
+  },
+  "firestore": {
+    "products": {
+      "schema": "Product",
+      "description": "Collection of available scripts."
+    },
+    "orders": {
+      "schema": "Order",
+      "description": "Collection of purchase transactions."
+    },
+    "admins": {
+      "schema": "AdminUser",
+      "description": "Collection of authorized admin users."
+    },
+    "adminRequests": {
+      "schema": "AdminRequest",
+      "description": "Requests from users to become admins."
+    }
+  }
+}
